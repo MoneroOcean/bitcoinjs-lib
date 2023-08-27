@@ -1,25 +1,32 @@
-import { ripemd160 as _ripemd160 } from '@noble/hashes/ripemd160';
-import { sha1 as _sha1 } from '@noble/hashes/sha1';
-import { sha256 as _sha256 } from '@noble/hashes/sha256';
+import * as createHash from 'create-hash';
+import * as RipeMd160 from 'ripemd160';
 
 export function ripemd160(buffer: Buffer): Buffer {
-  return Buffer.from(_ripemd160(Uint8Array.from(buffer)));
+  try {
+    return createHash('rmd160').update(buffer).digest();
+  } catch (err) {
+    try {
+      return createHash('ripemd160').update(buffer).digest();
+    } catch (err2) {
+      return new RipeMd160().update(buffer).digest();
+    }
+  }
 }
 
 export function sha1(buffer: Buffer): Buffer {
-  return Buffer.from(_sha1(Uint8Array.from(buffer)));
+  return createHash('sha1').update(buffer).digest();
 }
 
 export function sha256(buffer: Buffer): Buffer {
-  return Buffer.from(_sha256(Uint8Array.from(buffer)));
+  return createHash('sha256').update(buffer).digest();
 }
 
 export function hash160(buffer: Buffer): Buffer {
-  return Buffer.from(_ripemd160(_sha256(Uint8Array.from(buffer))));
+  return ripemd160(sha256(buffer));
 }
 
 export function hash256(buffer: Buffer): Buffer {
-  return Buffer.from(_sha256(_sha256(Uint8Array.from(buffer))));
+  return sha256(sha256(buffer));
 }
 
 export const TAGS = [
